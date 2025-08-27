@@ -1,0 +1,2 @@
+# Ignore generated HTML reports in language stats
+cucumber-report/* linguist-generated=true

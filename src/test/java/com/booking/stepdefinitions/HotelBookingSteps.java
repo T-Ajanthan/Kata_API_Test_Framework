@@ -1,7 +1,6 @@
 package com.booking.stepdefinitions;
 
 import io.cucumber.datatable.DataTable;
-//import io.cucumber.java.en.Background;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
@@ -16,80 +15,49 @@ import com.booking.utils.ConfigReader;
 import java.util.*;
 
 public class HotelBookingSteps {
-//    String baseUrl = ConfigReader.get("api.baseUrl");
     private String endpoint;
-//    private final String endpointPath = "/api/booking";
     private Response response;
     private Map<String, Object> lastRequestPayload;
-//    private static final String DEFAULT_BASE_URI = "https://automationintesting.online";
 
     @Given("the user has access to the hotel reservation endpoint {string}")
     public void setHotelBookingEndpoint(String endpointPath) {
         this.endpoint = ConfigReader.get("api.baseUrl") + endpointPath;
     }
 
-@When("the user submits a reservation request with the following details:")
-@When("the user submits a reservation request missing for the optional field")
-public void submitReservation(io.cucumber.datatable.DataTable dataTable) {
-    Map<String, String> reservation = dataTable.asMaps(String.class, String.class).get(0);
+    @When("the user submits a reservation request with the following details:")
+    @When("the user submits a reservation request missing for the optional field")
+    public void submitReservation(io.cucumber.datatable.DataTable dataTable) {
+        Map<String, String> reservation = dataTable.asMaps(String.class, String.class).get(0);
 
-    Map<String, String> bookingDates = new HashMap<>();
-    bookingDates.put("checkin", reservation.get("checkin"));
-    bookingDates.put("checkout", reservation.get("checkout"));
+        Map<String, String> bookingDates = new HashMap<>();
+        bookingDates.put("checkin", reservation.get("checkin"));
+        bookingDates.put("checkout", reservation.get("checkout"));
 
-    Map<String, Object> requestBody = new HashMap<>();
-    String roomIdValue = safeValue(reservation.get("roomid"));
-    if (!roomIdValue.isEmpty()) {
-        requestBody.put("roomid", Integer.parseInt(roomIdValue));
-    } else {
-        requestBody.put("roomid", "");
-    }
+        Map<String, Object> requestBody = new HashMap<>();
+        String roomIdValue = safeValue(reservation.get("roomid"));
+        if (!roomIdValue.isEmpty()) {
+            requestBody.put("roomid", Integer.parseInt(roomIdValue));
+        } else {
+            requestBody.put("roomid", "");
+        }
 //    requestBody.put("roomid", Integer.parseInt(reservation.get("roomid")));
-    requestBody.put("firstname", reservation.get("firstname"));
-    requestBody.put("lastname", reservation.get("lastname"));
-    requestBody.put("depositpaid", Boolean.parseBoolean(reservation.get("depositpaid")));
-    requestBody.put("bookingdates", bookingDates);
-    requestBody.put("email", reservation.get("email"));
-    requestBody.put("phone", reservation.get("phone"));
+        requestBody.put("firstname", reservation.get("firstname"));
+        requestBody.put("lastname", reservation.get("lastname"));
+        requestBody.put("depositpaid", Boolean.parseBoolean(reservation.get("depositpaid")));
+        requestBody.put("bookingdates", bookingDates);
+        requestBody.put("email", reservation.get("email"));
+        requestBody.put("phone", reservation.get("phone"));
 
-    response = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(requestBody).log().all()
-            .post(this.endpoint);
-}
+        response = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(requestBody).log().all()
+                .post(this.endpoint);
+    }
 
     @Then("the response status code should be {int}")
     public void the_response_status_code_should_be(Integer int1) {
         Assertions.assertThat(response.getStatusCode()).isEqualTo(int1);
     }
-
-//    @Then("the response status code should be {int} and the error messages should include {string}")
-//    public void validateStatusCodeAndErrors(int expectedStatusCode, String expectedErrors) {
-//        Assertions.assertThat(response.getStatusCode())
-//                .as("Check response status code")
-//                .isEqualTo(expectedStatusCode);
-//        List<String> actualMessages = response.jsonPath().getList("errors");
-//
-//        if (actualMessages == null || actualMessages.isEmpty()) {
-//            Assertions.fail("No error messages found in the response.");
-//        }
-//        String[] expectedMessages = expectedErrors.split(";");
-//        for (String expectedMessage : expectedMessages) {
-//            expectedMessage = expectedMessage.trim();
-//            boolean found = false;
-//
-//            for (String actualMessage : actualMessages) {
-//                if (actualMessage.trim().contains(expectedMessage)) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//
-//            Assertions.assertThat(found)
-//                    .as("Expected error message to be present: " + expectedMessage)
-//                    .isTrue();
-//        }
-//    }
 
     @Then("the response status code should be {int} and the error messages should include {string}")
     public void validateStatusCodeAndErrors(int expectedStatusCode, String expectedErrors) {
@@ -148,47 +116,11 @@ public void submitReservation(io.cucumber.datatable.DataTable dataTable) {
                 .post(this.endpoint);
     }
 
-//    private String safeValue(String value) {
-//        return value == null ? "" : value.trim();
-//    }
-//    private Integer parseIntegerOrNull(String value) {
-//        try {
-////            reduce complexity
-//            return (value == null || value.isEmpty()) ? null : Integer.parseInt(value);
-//        } catch (NumberFormatException e) {
-//            return null;
-//        }
-//    }
-//    private Boolean parseBooleanOrNull(String value) {
-//        if (value == null || value.isEmpty()) return null;
-//        return Boolean.parseBoolean(value);
-//    }
-
-private String safeValue(String value) {
-    return isNullOrEmpty(value) ? "" : value.trim();
-}
-
-    private Integer parseIntegerOrNull(String value) {
-        if (isNullOrEmpty(value)) return null;
-        return tryParseInt(value);
+    private String safeValue(String value) {
+        return isNullOrEmpty(value) ? "" : value.trim();
     }
 
-    private Boolean parseBooleanOrNull(String value) {
-        if (isNullOrEmpty(value)) return null;
-        return Boolean.parseBoolean(value);
-    }
-
-    // 🔽 Helper methods
     private boolean isNullOrEmpty(String value) {
         return value == null || value.trim().isEmpty();
     }
-
-    private Integer tryParseInt(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
 }

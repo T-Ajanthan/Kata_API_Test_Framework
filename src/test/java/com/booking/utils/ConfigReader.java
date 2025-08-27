@@ -5,7 +5,7 @@ import java.util.Properties;
 
 public class ConfigReader {
 
-    private static Properties properties = new Properties();
+    private static final Properties properties = new Properties();
 
     static {
         try (InputStream input = ConfigReader.class.getClassLoader()
@@ -16,7 +16,7 @@ public class ConfigReader {
                 throw new RuntimeException("application.properties not found in classpath");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to load application.properties", e);
         }
     }
 
